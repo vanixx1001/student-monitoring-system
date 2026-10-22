@@ -33,7 +33,7 @@ export default function Login({ status, canResetPassword }: LoginProps) {
         setData((prev) => ({
             ...prev,
             email,
-            password: "password", // standard test password
+            password: "password123", // standard test password
         }));
     };
 
