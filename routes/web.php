@@ -1,12 +1,13 @@
 <?php
 
+use App\Http\Controllers\AuthController;
 use App\Models\Grade;
 use App\Models\Subject;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
-use App\Http\Controllers\AuthController;
 
 Route::inertia('/', 'welcome')->name('home');
 
@@ -17,6 +18,9 @@ Route::middleware('guest')->group(function () {
 
     Route::get('/register', [AuthController::class, 'showRegister'])->name('register');
     Route::post('/register', [AuthController::class, 'register']);
+
+    // OTP Verification Endpoint
+    Route::post('/send-otp', [AuthController::class, 'sendOtp'])->name('otp.send');
 });
 
 // Logout Route (Auth Protected)
@@ -133,7 +137,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
             'student_email' => 'required|email|exists:users,email',
         ]);
 
-        $student = \App\Models\User::where('email', $validated['student_email'])
+        $student = User::where('email', $validated['student_email'])
             ->where('role', 'student')
             ->first();
 
