@@ -27,6 +27,8 @@ Route::middleware('guest')->group(function () {
 Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth')->name('logout');
 
 Route::middleware(['auth', 'verified'])->group(function () {
+
+    // DASHBOARD OVERVIEW (Executive Command Center)
     Route::get('/dashboard', function () {
         $user = Auth::user();
 
@@ -68,101 +70,169 @@ Route::middleware(['auth', 'verified'])->group(function () {
         ]);
     })->name('dashboard');
 
-    // Route para sa Professor kapag nag-e-encode o update ng grades
-    Route::post('/professor/grades/update', function (Request $request) {
-        $validated = $request->validate([
-            'student_id' => 'required|exists:users,id',
-            'subject_id' => 'required|exists:subjects,id',
-            'prelim' => 'required|numeric|min:0|max:100',
-            'midterm' => 'required|numeric|min:0|max:100',
-            'finals' => 'required|numeric|min:0|max:100',
-        ]);
+    // ==========================================
+    // PROFESSOR SPECIFIC ROUTES (MODULAR PAGES)
+    // ==========================================
+    Route::prefix('professor')->name('professor.')->group(function () {
 
-        $rawAvg = round(($validated['prelim'] + $validated['midterm'] + $validated['finals']) / 3, 2);
+        // 1. My Subjects Management List Page
+        Route::get('/subjects', function () {
+            $user = Auth::user();
+            abort_if($user->role !== 'professor', 403);
 
-        // ICCT Scale Grade Point Converter
-        $point = match (true) {
-            $rawAvg >= 97.00 => 1.00,
-            $rawAvg >= 94.00 => 1.25,
-            $rawAvg >= 91.00 => 1.50,
-            $rawAvg >= 88.00 => 1.75,
-            $rawAvg >= 85.00 => 2.00,
-            $rawAvg >= 82.00 => 2.25,
-            $rawAvg >= 79.00 => 2.50,
-            $rawAvg >= 76.00 => 2.75,
-            $rawAvg >= 75.00 => 3.00,
-            default => 5.00,
-        };
+            $subjects = Subject::with(['grades.student'])
+                ->where('professor_id', $user->id)
+                ->get();
 
-        Grade::updateOrCreate(
-            [
-                'student_id' => $validated['student_id'],
-                'subject_id' => $validated['subject_id'],
-            ],
-            [
-                'prelim' => $validated['prelim'],
-                'midterm' => $validated['midterm'],
-                'finals' => $validated['finals'],
-                'raw_average' => $rawAvg,
-                'grade_point' => $point,
-                'remarks' => $point <= 3.00 ? 'Passed' : 'Failed',
-            ]
-        );
+            return Inertia::render('professor/subjects/index', [
+                'auth' => ['user' => $user],
+                'subjects' => $subjects,
+            ]);
+        })->name('subjects.index');
 
-        return back()->with('success', 'Grade updated successfully!');
-    })->name('professor.grades.update');
+        // 2. Class Masterlist & Detailed Grade Sheet Page
+        Route::get('/subjects/{id}', function ($id) {
+            $user = Auth::user();
+            abort_if($user->role !== 'professor', 403);
 
-    // Magdagdag ng bagong Subject (Professor)
-    Route::post('/professor/subjects/create', function (Request $request) {
-        $validated = $request->validate([
-            'subject_code' => 'required|string|max:20',
-            'subject_name' => 'required|string|max:255',
-            'units' => 'required|integer|min:1|max:6',
-        ]);
+            $subject = Subject::with(['grades.student'])
+                ->where('professor_id', $user->id)
+                ->findOrFail($id);
 
-        Subject::create([
-            'subject_code' => strtoupper($validated['subject_code']),
-            'subject_name' => $validated['subject_name'],
-            'units' => $validated['units'],
-            'professor_id' => Auth::id(),
-        ]);
+            return Inertia::render('professor/subjects/show', [
+                'auth' => ['user' => $user],
+                'subject' => $subject,
+            ]);
+        })->name('subjects.show');
 
-        return back()->with('success', 'Subject created successfully!');
-    })->name('professor.subjects.create');
+        // 3. Performance & Grade Analytics Matrix Page
+        Route::get('/analytics', function () {
+            $user = Auth::user();
+            abort_if($user->role !== 'professor', 403);
 
-    // Mag-enroll ng Estudyante sa Subject (Professor)
-    Route::post('/professor/subjects/enroll', function (Request $request) {
-        $validated = $request->validate([
-            'subject_id' => 'required|exists:subjects,id',
-            'student_email' => 'required|email|exists:users,email',
-        ]);
+            $subjects = Subject::with(['grades.student'])
+                ->where('professor_id', $user->id)
+                ->get();
 
-        $student = User::where('email', $validated['student_email'])
-            ->where('role', 'student')
-            ->first();
+            return Inertia::render('professor/analytics/index', [
+                'auth' => ['user' => $user],
+                'subjects' => $subjects,
+            ]);
+        })->name('analytics.index');
 
-        if (!$student) {
-            return back()->withErrors(['student_email' => 'Walang nahanap na student account gamit ang email na ito.']);
-        }
+        // 4. At-Risk Early Warning & Intervention Page
+        Route::get('/at-risk', function () {
+            $user = Auth::user();
+            abort_if($user->role !== 'professor', 403);
 
-        // Gumawa ng entry sa grades table na may default 0 scores
-        Grade::firstOrCreate(
-            [
-                'student_id' => $student->id,
-                'subject_id' => $validated['subject_id'],
-            ],
-            [
-                'prelim' => 0,
-                'midterm' => 0,
-                'finals' => 0,
-                'raw_average' => 0,
-                'grade_point' => 5.00,
-                'remarks' => 'Incomplete',
-            ]
-        );
+            $subjects = Subject::with(['grades.student'])
+                ->where('professor_id', $user->id)
+                ->get();
 
-        return back()->with('success', 'Student enrolled successfully!');
-    })->name('professor.subjects.enroll');
+            return Inertia::render('professor/students/at-risk', [
+                'auth' => ['user' => $user],
+                'subjects' => $subjects,
+            ]);
+        })->name('at-risk.index');
+
+        // ==========================================
+        // PROFESSOR FORM ACTIONS
+        // ==========================================
+
+        // Create Subject
+        Route::post('/subjects/create', function (Request $request) {
+            $validated = $request->validate([
+                'subject_code' => 'required|string|max:20',
+                'subject_name' => 'required|string|max:255',
+                'units' => 'required|integer|min:1|max:6',
+            ]);
+
+            Subject::create([
+                'subject_code' => strtoupper($validated['subject_code']),
+                'subject_name' => $validated['subject_name'],
+                'units' => $validated['units'],
+                'professor_id' => Auth::id(),
+            ]);
+
+            return back()->with('success', 'Subject created successfully!');
+        })->name('subjects.create');
+
+        // Enroll Student
+        Route::post('/subjects/enroll', function (Request $request) {
+            $validated = $request->validate([
+                'subject_id' => 'required|exists:subjects,id',
+                'student_email' => 'required|email|exists:users,email',
+            ]);
+
+            $student = User::where('email', $validated['student_email'])
+                ->where('role', 'student')
+                ->first();
+
+            if (!$student) {
+                return back()->withErrors(['student_email' => 'Walang nahanap na student account gamit ang email na ito.']);
+            }
+
+            Grade::firstOrCreate(
+                [
+                    'student_id' => $student->id,
+                    'subject_id' => $validated['subject_id'],
+                ],
+                [
+                    'prelim' => 0,
+                    'midterm' => 0,
+                    'finals' => 0,
+                    'raw_average' => 0,
+                    'grade_point' => 5.00,
+                    'remarks' => 'Incomplete',
+                ]
+            );
+
+            return back()->with('success', 'Student enrolled successfully!');
+        })->name('subjects.enroll');
+
+        // Grade Encoding / Update
+        Route::post('/grades/update', function (Request $request) {
+            $validated = $request->validate([
+                'student_id' => 'required|exists:users,id',
+                'subject_id' => 'required|exists:subjects,id',
+                'prelim' => 'required|numeric|min:0|max:100',
+                'midterm' => 'required|numeric|min:0|max:100',
+                'finals' => 'required|numeric|min:0|max:100',
+            ]);
+
+            $rawAvg = round(($validated['prelim'] + $validated['midterm'] + $validated['finals']) / 3, 2);
+
+            $point = match (true) {
+                $rawAvg >= 97.00 => 1.00,
+                $rawAvg >= 94.00 => 1.25,
+                $rawAvg >= 91.00 => 1.50,
+                $rawAvg >= 88.00 => 1.75,
+                $rawAvg >= 85.00 => 2.00,
+                $rawAvg >= 82.00 => 2.25,
+                $rawAvg >= 79.00 => 2.50,
+                $rawAvg >= 76.00 => 2.75,
+                $rawAvg >= 75.00 => 3.00,
+                default => 5.00,
+            };
+
+            Grade::updateOrCreate(
+                [
+                    'student_id' => $validated['student_id'],
+                    'subject_id' => $validated['subject_id'],
+                ],
+                [
+                    'prelim' => $validated['prelim'],
+                    'midterm' => $validated['midterm'],
+                    'finals' => $validated['finals'],
+                    'raw_average' => $rawAvg,
+                    'grade_point' => $point,
+                    'remarks' => $point <= 3.00 ? 'Passed' : 'Failed',
+                ]
+            );
+
+            return back()->with('success', 'Grade updated successfully!');
+        })->name('grades.update');
+    });
 
 });
 

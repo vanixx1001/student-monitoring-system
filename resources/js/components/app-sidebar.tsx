@@ -1,5 +1,14 @@
 import { Link, usePage } from "@inertiajs/react";
-import { LayoutGrid, Moon, Sun, GraduationCap, UserCheck } from "lucide-react";
+import {
+    LayoutGrid,
+    Moon,
+    Sun,
+    GraduationCap,
+    UserCheck,
+    BookOpen,
+    TrendingUp,
+    AlertTriangle,
+} from "lucide-react";
 import { useEffect, useState } from "react";
 import { NavMain } from "@/components/nav-main";
 import { NavUser } from "@/components/nav-user";
@@ -14,17 +23,44 @@ import {
 import { dashboard } from "@/routes";
 import type { NavItem } from "@/types";
 
-const mainNavItems: NavItem[] = [
-    {
-        title: "Dashboard Overview",
-        href: dashboard(),
-        icon: LayoutGrid,
-    },
-];
-
 export function AppSidebar() {
     const { auth } = usePage<any>().props;
     const [theme, setTheme] = useState<"light" | "dark">("dark");
+
+    const role = auth?.user?.role || "student";
+
+    // Dynamic Navigation base sa Role
+    const navItems: NavItem[] =
+        role === "professor"
+            ? [
+                  {
+                      title: "Dashboard Overview",
+                      href: dashboard(),
+                      icon: LayoutGrid,
+                  },
+                  {
+                      title: "My Subjects",
+                      href: "/professor/subjects",
+                      icon: BookOpen,
+                  },
+                  {
+                      title: "Grade Analytics",
+                      href: "/professor/analytics",
+                      icon: TrendingUp,
+                  },
+                  {
+                      title: "At-Risk Monitoring",
+                      href: "/professor/at-risk",
+                      icon: AlertTriangle,
+                  },
+              ]
+            : [
+                  {
+                      title: "Dashboard Overview",
+                      href: dashboard(),
+                      icon: LayoutGrid,
+                  },
+              ];
 
     useEffect(() => {
         const isDark = document.documentElement.classList.contains("dark");
@@ -50,7 +86,7 @@ export function AppSidebar() {
             variant="inset"
             className="border-r border-neutral-200 dark:border-neutral-800/80 bg-white dark:bg-neutral-950 transition-colors duration-200"
         >
-            {/* Header: Title Logo + Theme Toggle (Kusang mawawala kapag naka-collapse) */}
+            {/* Header: Title Logo + Theme Toggle */}
             <SidebarHeader className="border-b border-neutral-100 dark:border-neutral-900 pb-3 group-data-[collapsible=icon]:hidden">
                 <SidebarMenu>
                     <SidebarMenuItem>
@@ -106,12 +142,12 @@ export function AppSidebar() {
                 </SidebarMenu>
             </SidebarHeader>
 
-            {/* Content: Role Badge & Navigation (Mawawala rin pareho kapag naka-collapse) */}
+            {/* Content: Role Badge & Navigation Links */}
             <SidebarContent className="px-2 pt-3 space-y-4 group-data-[collapsible=icon]:hidden">
                 {/* Role Badge Indicator */}
                 <div className="px-2 py-2 rounded-xl bg-neutral-50 dark:bg-neutral-900/50 border border-neutral-200/70 dark:border-neutral-800/60 flex items-center gap-2.5">
                     <div className="p-1.5 rounded-lg bg-teal-500/15 text-teal-600 dark:text-teal-400">
-                        {auth.user?.role === "professor" ? (
+                        {role === "professor" ? (
                             <UserCheck size={14} />
                         ) : (
                             <GraduationCap size={14} />
@@ -122,18 +158,18 @@ export function AppSidebar() {
                             Logged in as
                         </p>
                         <p className="text-xs font-semibold capitalize text-neutral-800 dark:text-neutral-200">
-                            {auth.user?.role || "User"} Mode
+                            {role} Mode
                         </p>
                     </div>
                 </div>
 
-                {/* Main Navigation Links */}
+                {/* Main Dynamic Navigation Links */}
                 <div className="space-y-1">
-                    <NavMain items={mainNavItems} />
+                    <NavMain items={navItems} />
                 </div>
             </SidebarContent>
 
-            {/* Footer: User Account (Ito LANG ang maiiwang nakalitaw sa pinakababa) */}
+            {/* Footer: User Account */}
             <SidebarFooter className="border-t border-neutral-100 dark:border-neutral-900 pt-2 mt-auto">
                 <NavUser />
             </SidebarFooter>
