@@ -47,7 +47,7 @@ export default function AuthLayout({
                             <div className="min-w-0">
                                 <div className="flex flex-wrap items-center gap-2">
                                     <h1 className="text-base font-extrabold leading-tight tracking-tight text-zinc-900 dark:text-white">
-                                        University of Vanixx
+                                        EduTrack
                                     </h1>
 
                                     <span className="rounded-md border border-teal-500/30 dark:border-teal-400/20 bg-teal-500/10 dark:bg-teal-400/10 px-1.5 py-0.5 text-[9px] font-bold tracking-wider text-teal-700 dark:text-teal-400">
@@ -123,7 +123,7 @@ export default function AuthLayout({
                     <div className="relative z-10 mt-10 flex items-center justify-between gap-4 border-t border-stone-200 dark:border-white/[0.07] pt-6">
                         <div className="flex items-center gap-2.5 text-xs text-zinc-500 dark:text-zinc-400">
                             <GraduationCap size={16} />
-                            <span>University of Vanixx</span>
+                            <span>EduTrack</span>
                         </div>
 
                         <div className="flex items-center gap-2 text-xs font-semibold text-emerald-600 dark:text-emerald-400">
@@ -171,7 +171,7 @@ export default function AuthLayout({
                             <div className="min-w-0">
                                 <div className="flex flex-wrap items-center gap-2">
                                     <h1 className="text-sm font-extrabold leading-tight tracking-tight text-zinc-900 dark:text-white">
-                                        University of Vanixx
+                                        EduTrack
                                     </h1>
 
                                     <span className="rounded-md border border-teal-500/30 dark:border-teal-400/20 bg-teal-500/10 dark:bg-teal-400/10 px-1.5 py-0.5 text-[9px] font-bold tracking-wider text-teal-700 dark:text-teal-400">
@@ -208,8 +208,7 @@ export default function AuthLayout({
                         <footer className="mt-10 border-t border-stone-200 dark:border-white/[0.07] pt-5">
                             <div className="flex flex-wrap items-center justify-between gap-3 text-[11px] text-zinc-500 dark:text-zinc-400">
                                 <span>
-                                    © {new Date().getFullYear()} University of
-                                    Vanixx
+                                    © {new Date().getFullYear()} EduTrack
                                 </span>
 
                                 <span className="inline-flex items-center gap-1.5">

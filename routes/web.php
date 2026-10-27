@@ -84,9 +84,16 @@ Route::middleware(['auth', 'verified'])->group(function () {
                 ->where('professor_id', $user->id)
                 ->get();
 
+            // Kunin ang lahat ng registered students para sa enrollment dropdown
+            $allStudents = User::where('role', 'student')
+                ->select('id', 'name', 'email')
+                ->orderBy('name')
+                ->get();
+
             return Inertia::render('professor/subjects/index', [
                 'auth' => ['user' => $user],
                 'subjects' => $subjects,
+                'allStudents' => $allStudents,
             ]);
         })->name('subjects.index');
 
@@ -159,17 +166,21 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
         // Enroll Student
         Route::post('/subjects/enroll', function (Request $request) {
+            // Suportahan kung 'email' man o 'student_email' ang ipasa ng form
+            $email = $request->input('email') ?? $request->input('student_email');
+            $request->merge(['email' => $email]);
+
             $validated = $request->validate([
                 'subject_id' => 'required|exists:subjects,id',
-                'student_email' => 'required|email|exists:users,email',
+                'email' => 'required|email|exists:users,email',
             ]);
 
-            $student = User::where('email', $validated['student_email'])
+            $student = User::where('email', $validated['email'])
                 ->where('role', 'student')
                 ->first();
 
             if (!$student) {
-                return back()->withErrors(['student_email' => 'Walang nahanap na student account gamit ang email na ito.']);
+                return back()->withErrors(['email' => 'Walang nahanap na student account gamit ang email na ito.']);
             }
 
             Grade::firstOrCreate(

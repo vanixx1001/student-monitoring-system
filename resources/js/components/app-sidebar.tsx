@@ -106,8 +106,8 @@ export function AppSidebar() {
                                 </div>
                                 <div className="flex flex-col text-left leading-tight truncate">
                                     <div className="flex items-center gap-1.5">
-                                        <span className="font-black text-sm uppercase tracking-tight text-neutral-900 dark:text-white">
-                                            Vanixx
+                                        <span className="font-black text-sm tracking-tight text-neutral-900 dark:text-white">
+                                            EduTrack
                                         </span>
                                         <span className="px-1.5 py-0.2 rounded bg-teal-500/10 text-teal-600 dark:text-teal-400 font-bold text-[9px] border border-teal-500/20 tracking-wider">
                                             PORTAL

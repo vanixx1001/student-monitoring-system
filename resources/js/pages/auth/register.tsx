@@ -122,7 +122,7 @@ export default function Register() {
                     </h1>
 
                     <p className="text-sm text-zinc-500 dark:text-zinc-400">
-                        Join the University of Vanixx portal. Fill in your
+                        Join the EduTrack portal. Fill in your
                         details to get started.
                     </p>
                 </div>
@@ -262,7 +262,7 @@ export default function Register() {
                                     onChange={(e) =>
                                         setData("email", e.target.value)
                                     }
-                                    placeholder="user@vanixx.edu.ph"
+                                    placeholder="user@edutrack.edu.ph"
                                     required
                                     className="w-full h-12 rounded-xl border border-zinc-300 dark:border-zinc-800 bg-white dark:bg-zinc-900/70 pl-10 pr-4 text-sm text-zinc-900 dark:text-white placeholder-zinc-400 dark:placeholder-zinc-500 focus:border-teal-500 focus:outline-none focus:ring-1 focus:ring-teal-500 transition shadow-sm"
                                 />

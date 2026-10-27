@@ -200,7 +200,7 @@ export default function Welcome({ auth }: WelcomeProps) {
                         <div>
                             <div className="flex items-center gap-2">
                                 <p className="text-base font-extrabold tracking-tight leading-none text-zinc-900 dark:text-white">
-                                    University of Vanixx
+                                    EduTrack
                                 </p>
                                 <span className="rounded bg-teal-500/10 px-1.5 py-0.5 text-[10px] font-bold text-teal-600 dark:text-teal-400 border border-teal-500/20">
                                     PORTAL
@@ -327,7 +327,7 @@ export default function Welcome({ auth }: WelcomeProps) {
                                         size={14}
                                         className="text-teal-600 dark:text-teal-400"
                                     />
-                                    portal.vanixx.edu.ph/academic-record
+                                    portal.edutrack.edu.ph/academic-record
                                 </span>
                             </div>
                             <div className="flex items-center gap-2">
@@ -722,7 +722,7 @@ export default function Welcome({ auth }: WelcomeProps) {
                                     size={14}
                                     className="text-teal-600 dark:text-teal-400"
                                 />
-                                <span>University of Vanixx - {campus}</span>
+                                <span>EduTrack - {campus}</span>
                             </div>
                         ))}
                     </div>
@@ -766,7 +766,7 @@ export default function Welcome({ auth }: WelcomeProps) {
                             />
                         </div>
                         <p>
-                            © {new Date().getFullYear()} University of Vanixx —
+                            © {new Date().getFullYear()} EduTrack —
                             Student Academic Performance Monitoring System.
                         </p>
                     </div>
@@ -802,7 +802,7 @@ export default function Welcome({ auth }: WelcomeProps) {
                                         </span>
                                     </div>
                                     <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">
-                                        University of Vanixx Early Warning &
+                                        EduTrack Early Warning &
                                         Retention Flow
                                     </p>
                                 </div>

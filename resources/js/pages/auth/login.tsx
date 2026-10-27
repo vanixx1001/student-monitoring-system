@@ -46,7 +46,7 @@ export default function Login({ status, canResetPassword }: LoginProps) {
                 <div className="space-y-2 pb-2">
                     <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-zinc-900 dark:text-white">
                         Sign In
-                    </h1>
+                    </h1>   
                     <p className="text-sm text-zinc-500 dark:text-zinc-400">
                         Welcome back. Access your academic portal and records.
                     </p>
@@ -82,7 +82,7 @@ export default function Login({ status, canResetPassword }: LoginProps) {
                                 onChange={(e) =>
                                     setData("email", e.target.value)
                                 }
-                                placeholder="user@vanixx.edu.ph"
+                                placeholder="user@edutrack.edu.ph"
                                 required
                                 className="w-full h-12 rounded-xl border border-zinc-300 dark:border-zinc-800 bg-white dark:bg-zinc-900/70 pl-10 pr-4 text-sm text-zinc-900 dark:text-white placeholder-zinc-400 dark:placeholder-zinc-500 focus:border-teal-500 focus:outline-none focus:ring-1 focus:ring-teal-500 transition shadow-sm"
                             />
